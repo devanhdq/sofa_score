@@ -12,15 +12,12 @@ class TournamentsSpider(scrapy.Spider):
     allowed_domains = ["api.sofascore.com"]
     main_url = "https://api.sofascore.com/api/v1/sport/football/scheduled-events/"
 
-    # days = generate_dates(start_date=datetime(2023, 12, 31))
+    days = generate_dates(start_date=datetime(2023, 12, 31))
 
-    urls = ["https://api.sofascore.com/api/v1/sport/football/scheduled-events/2000-06-14"]
+    urls = []
 
-    # urls = ["https://api.sofascore.com/api/v1/sport/football/scheduled-events/2000-06-23"]
-
-    #
-    # for days in days:
-    #     urls.append(f"{main_url}{days}")
+    for days in days:
+        urls.append(f"{main_url}{days}")
 
     def start_requests(self):
         for url in self.urls:
@@ -37,101 +34,116 @@ class TournamentsSpider(scrapy.Spider):
         json_response = json.loads(response.body)
         tournament_item = TournamentItem()
 
-        events = json_response.get("events")
+        events = json_response.get("events", [])
         if len(events) != 0:
             for event in events:
-                tournament_item['tournament_id'] = event.get("id", None)
-                tournament_item['country'] = (
-                    event.get("tournament", {}).get("category", {}).get("name", None)
-                )
-                tournament_item['name'] = event.get("tournament", {}).get("name", None)
-                tournament_item['season'] = event.get("season", {}).get("name", None)
+                tournament = event.get("tournament", {})
+                tournament_item['tournament_name'] = tournament.get("name", None)
+                tournament_item['tournament_category_name'] = tournament.get("category", {}).get("name", None)
+                tournament_item['tournament_category_id'] = tournament.get("category", {}).get("id", None)
+                tournament_item['tournament_unique_name'] = tournament.get("uniqueTournament", {}).get("name", None)
+                tournament_has_statistics = tournament.get("uniqueTournament", {}).get(
+                    "hasEventPlayerStatistics", None)
+                tournament_item['tournament_has_statistics'] = tournament_has_statistics
 
-                tournament_item['year'] = event.get("season", {}).get("year", None)
-                tournament_item['round'] = event.get("roundInfo", {}).get("round", None)
-                tournament_item['status_code'] = event.get("status", {}).get("code", None)
-                tournament_item['winner_code'] = event.get("winnerCode", None)
-                tournament_item['home_team'] = event.get("homeTeam", {}).get("name", None)
-                tournament_item['away_team'] = event.get("awayTeam", {}).get("name", None)
-                tournament_item['home_score'] = event.get("homeScore", {}).get("current", None)
-                tournament_item['home_period1'] = event.get("homeScore", {}).get("period1", None)
-                tournament_item['home_period2'] = event.get("homeScore", {}).get("period2", None)
-                tournament_item['away_score'] = event.get("awayScore", {}).get("current", None)
-                tournament_item['away_period1'] = event.get("awayScore", {}).get("period1", None)
-                tournament_item['away_period2'] = event.get("awayScore", {}).get("period2", None)
-                tournament_item['time_injury_time1'] = event.get("time", {}).get("injuryTime1", None)
-                tournament_item['time_injury_time2'] = event.get("time", {}).get("injuryTime2", None)
-                tournament_item['has_global_highlights'] = event.get("hasGlobalHighlights", None)
-                tournament_item['has_event_player_statistics'] = event.get("hasEventPlayerStatistics", None)
-                tournament_item['has_event_player_heat_map'] = event.get("hasEventPlayerHeatMap", None)
-                tournament_item['start_timestamp'] = event.get("startTimestamp", None)
-                tournament_item['url'] = response.meta.get("url")
-                yield tournament_item
+                season = event.get("season", {})
+                tournament_item['tournament_session_name'] = season.get("name", None)
+                tournament_item['tournament_session_year'] = season.get("year", None)
+                tournament_item['tournament_session_id'] = season.get("id", None)
 
-#     for event in events:
-#         tournament_item['tournament_id'] = event.get("id", None)
-#         tournament_item['country'] = (
-#             event.get("tournament", {}).get("category", {}).get("name", None)
-#         )
-#         tournament_item['name'] = event.get("tournament", {}).get("name", None)
-#         tournament_item['season'] = event.get("season", {}).get("name", None)
-#         tournament_item['year'] = event.get("season", {}).get("year", None)
-#         tournament_item['round'] = event.get("roundInfo", {}).get("round", None)
-#         tournament_item['status_code'] = event.get("status", {}).get("code", None)
-#         tournament_item['winner_code'] = event.get("winnerCode", None)
-#         tournament_item['home_team'] = event.get("homeTeam", {}).get("name", None)
-#         tournament_item['away_team'] = event.get("awayTeam", {}).get("name", None)
-#         tournament_item['home_score'] = event.get("homeScore", {}).get("current", None)
-#         tournament_item['home_period1'] = event.get("homeScore", {}).get("period1", None)
-#         tournament_item['home_period2'] = event.get("homeScore", {}).get("period2", None)
-#         tournament_item['away_score'] = event.get("awayScore", {}).get("current", None)
-#         tournament_item['away_period1'] = event.get("awayScore", {}).get("period1", None)
-#         tournament_item['away_period2'] = event.get("awayScore", {}).get("period2", None)
-#         tournament_item['time_injury_time1'] = event.get("time", {}).get("injuryTime1", None)
-#         tournament_item['time_injury_time2'] = event.get("time", {}).get("injuryTime2", None)
-#         tournament_item['has_global_highlights'] = event.get("hasGlobalHighlights", None)
-#         tournament_item['has_event_player_statistics'] = event.get("hasEventPlayerStatistics", None)
-#         tournament_item['has_event_player_heat_map'] = event.get("hasEventPlayerHeatMap", None)
-#         tournament_item['start_timestamp'] = event.get("startTimestamp", None)
-#         tournament_item['url'] = response.meta.get("url")
-#
-#         if tournament_item['has_event_player_statistics']:
-#             logging.info("True**********")
-#             yield scrapy.Request(
-#                 url=f"https://api.sofascore.com/api/v1/event/{tournament_item['tournament_id']}/statistics",
-#                 callback=self.parse_statistics,
-#                 # errback=self.errback_httpbin_statistics,
-#                 meta={
-#                     "tournament_item": tournament_item,
-#                 }
-#             )
-#         else:
-#             tournament_item['statistic_period'] = None
-#             tournament_item['statistic_group'] = None
-#             tournament_item['statistic_name'] = None
-#             tournament_item['statistic_type'] = None
-#             tournament_item['statistic_home_value'] = None
-#             tournament_item['statistic_away_value'] = None
-#             tournament_item['statistic_compare_code'] = None
-#             yield tournament_item
-#
-# def parse_statistics(self, response):
-#     json_response = json.loads(response.body)
-#     statistics = json_response.get("statistics", [])
-#     tournament_item = response.meta.get("tournament_item")
-#     for statistic in statistics:
-#         period = statistic.get("period", None)
-#         for group in statistic.get("groups", []):
-#             statistic_name = group.get("groupName", None)
-#             for statistic_item in group.get("statisticsItems", []):
-#                 tournament_item["statistic_period"]: period
-#                 tournament_item["statistic_group"]: statistic_name
-#                 tournament_item["statistic_name"]: statistic_item.get("name", None)
-#                 tournament_item["statistic_type"]: statistic_item.get("statisticsType", None)
-#                 tournament_item["statistic_home_value"]: statistic_item.get("homeValue", None)
-#                 tournament_item["statistic_away_value"]: statistic_item.get("awayValue", None)
-#                 tournament_item["statistic_compare_code"]: statistic_item.get("compareCode", None)
-#             yield tournament_item
+                round_info = event.get("roundInfo", {})
+                tournament_item['tournament_round'] = round_info.get("round", None)
+                tournament_item['tournament_round_name'] = round_info.get("name", None)
+
+                status = event.get("status", {})
+                tournament_item['tournament_status_code'] = status.get("code", None)
+                tournament_item['tournament_status_description'] = status.get("description", None)
+
+                tournament_item['tournament_winner_code'] = event.get("winnerCode", None)
+
+                home_team = event.get("homeTeam", {})
+                tournament_item['tournament_home_team_name'] = home_team.get("name", None)
+                tournament_item['tournament_home_team_country'] = home_team.get("country", {}).get("name", None)
+                tournament_item['tournament_home_team_id'] = home_team.get("id", None)
+                tournament_item['tournament_home_team_color_primary'] = home_team.get("teamColors", {}).get("primary",
+                                                                                                            None)
+                tournament_item['tournament_home_team_color_secondary'] = home_team.get("teamColors", {}).get(
+                    "secondary", None)
+
+                away_team = event.get("awayTeam", {})
+                tournament_item['tournament_away_team_name'] = away_team.get("name", None)
+                tournament_item['tournament_away_team_country'] = away_team.get("country", {}).get("name", None)
+                tournament_item['tournament_away_team_id'] = away_team.get("id", None)
+                tournament_item['tournament_away_team_color_primary'] = away_team.get("teamColors", {}).get("primary",
+                                                                                                            None)
+                tournament_item['tournament_away_team_color_secondary'] = away_team.get("teamColors", {}).get(
+                    "secondary", None)
+
+                home_score = event.get("homeScore", {})
+                tournament_item['tournament_home_score'] = home_score.get("display", None)
+                tournament_item['tournament_home_score_period_1'] = home_score.get("period1", None)
+                tournament_item['tournament_home_score_period_2'] = home_score.get("period2", None)
+                tournament_item['tournament_home_score_overtime'] = home_score.get("overtime", None)
+                tournament_item['tournament_home_score_extra1'] = home_score.get("extra1", None)
+                tournament_item['tournament_home_score_extra2'] = home_score.get("extra2", None)
+
+                away_score = event.get("awayScore", {})
+                tournament_item['tournament_away_score'] = away_score.get("display", None)
+                tournament_item['tournament_away_score_period_1'] = away_score.get("period1", None)
+                tournament_item['tournament_away_score_period_2'] = away_score.get("period2", None)
+                tournament_item['tournament_away_score_overtime'] = away_score.get("overtime", None)
+                tournament_item['tournament_home_score_extra1'] = away_score.get("extra1", None)
+                tournament_item['tournament_home_score_extra2'] = away_score.get("extra2", None)
+
+                time = event.get("time", {})
+                tournament_item['tournament_time_1'] = time.get("injuryTime1", None)
+                tournament_item['tournament_time_2'] = time.get("injuryTime2", None)
+                tournament_item['tournament_time_3'] = time.get("injuryTime3", None)
+                tournament_item['tournament_time_4'] = time.get("injuryTime4", None)
+
+                tournament_item['tournament_has_global_highlights'] = event.get("hasGlobalHighlights", None)
+                tournament_id = event.get("id", None)
+                tournament_item['tournament_id'] = tournament_id
+                tournament_item['tournament_start_timestamp'] = event.get("startTimestamp", None)
+                tournament_item['tournament_has_event_player_heat_map'] = event.get("hasEventPlayerHeatMap", None)
+
+                hasEventPlayerStatistics = event.get('hasEventPlayerStatistics', None)
+                tournament_item['hasEventPlayerStatistics'] = hasEventPlayerStatistics
+
+                if tournament_has_statistics or hasEventPlayerStatistics:
+                    yield scrapy.Request(
+                        url=f"https://api.sofascore.com/api/v1/event/{tournament_id}/statistics",
+                        callback=self.parse_statistics,
+                        meta={
+                            "tournament": tournament_item
+                        }
+                    )
+                else:
+                    tournament_item['statistic_period'] = False
+                    tournament_item['statistic_group_name'] = False
+                    tournament_item['statistic_name'] = False
+                    tournament_item['statistic_type'] = False
+                    tournament_item['statistic_home_value'] = False
+                    tournament_item['statistic_away_value'] = False
+                    tournament_item['statistic_compare_code'] = False
+                    yield tournament_item
+
+    def parse_statistics(self, response):
+        json_response = json.loads(response.body)
+        tournament_item = response.meta["tournament"]
+        statistics = json_response.get("statistics", [])
+        for statistic in statistics:
+            tournament_item['statistic_period'] = statistic.get("name", None)
+            groups = statistic.get("groups", [])
+            for group in groups:
+                tournament_item['statistic_group_name'] = group.get("groupName", None)
+                for statistics_item in group.get("statistics", []):
+                    tournament_item['statistic_name'] = statistics_item.get("name", None)
+                    tournament_item['statistic_type'] = statistics_item.get("statisticsType", None)
+                    tournament_item['statistic_home_value'] = statistics_item.get("homeValue", None)
+                    tournament_item['statistic_away_value'] = statistics_item.get("awayValue", None)
+                    tournament_item['statistic_compare_code'] = statistics_item.get("compareCode", None)
+                    yield tournament_item
 
 # def errback_httpbin_statistics(self, failure):
 #     if failure.check(HttpError):
@@ -145,27 +157,3 @@ class TournamentsSpider(scrapy.Spider):
 #             "statistic_compare_code": None,
 #
 #         }
-
-# "tournament_id": tournament_item.get("tournament_id"),
-# "name": tournament_item.get("name"),
-# "country": tournament_item.get("country"),
-# "season": tournament_item.get("season"),
-# "year": tournament_item.get("year"),
-# "round": tournament_item.get("round"),
-# "status_code": tournament_item.get("status_code"),
-# "winner_code": tournament_item.get("winner_code"),
-# "home_team": tournament_item.get("home_team"),
-# "away_team": tournament_item.get("away_team"),
-# "home_score": tournament_item.get("home_score"),
-# "home_period1": tournament_item.get("home_period1"),
-# "home_period2": tournament_item.get("home_period2"),
-# "away_score": tournament_item.get("away_score"),
-# "away_period1": tournament_item.get("away_period1"),
-# "away_period2": tournament_item.get("away_period2"),
-# "time_injury_time1": tournament_item.get("time_injury_time1"),
-# "time_injury_time2": tournament_item.get("time_injury_time2"),
-# "has_global_highlights": tournament_item.get("has_global_highlights"),
-# "has_event_player_statistics": tournament_item.get("has_event_player_statistics"),
-# "has_event_player_heat_map": tournament_item.get("has_event_player_heat_map"),
-# "start_timestamp": tournament_item.get("start_timestamp"),
-# "url": tournament_item.get("url"),

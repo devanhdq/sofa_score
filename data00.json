@@ -1,0 +1,133 @@
+{
+  "events": [
+    {
+      "tournament": {
+        "name": "UEFA Euro, Group B",
+        "slug": "uefa-euro-group-b",
+        "category": {
+          "name": "Europe",
+          "slug": "europe",
+          "sport": {
+            "name": "Football",
+            "slug": "football",
+            "id": 1
+          },
+          "id": 1465,
+          "flag": "europe"
+        },
+        "uniqueTournament": {
+          "name": "European Championship",
+          "slug": "european-championship",
+          "category": {
+            "name": "Europe",
+            "slug": "europe",
+            "sport": {
+              "name": "Football",
+              "slug": "football",
+              "id": 1
+            },
+            "id": 1465,
+            "flag": "europe"
+          },
+          "userCount": 0,
+          "crowdsourcingEnabled": false,
+          "hasPerformanceGraphFeature": false,
+          "id": 1,
+          "hasEventPlayerStatistics": true,
+          "displayInverseHomeAwayTeams": false
+        },
+        "priority": 667,
+        "id": 1685
+      },
+      "season": {
+        "name": "Euro Cup 2000",
+        "year": "2000",
+        "editor": false,
+        "id": 358
+      },
+      "roundInfo": {
+        "round": 2
+      },
+      "customId": "hUbsrUb",
+      "status": {
+        "code": 100,
+        "description": "Ended",
+        "type": "finished"
+      },
+      "winnerCode": 2,
+      "homeTeam": {
+        "name": "Belgium",
+        "slug": "belgium",
+        "shortName": "Belgium",
+        "sport": {
+          "name": "Football",
+          "slug": "football",
+          "id": 1
+        },
+        "userCount": 0,
+        "nameCode": "BEL",
+        "national": true,
+        "type": 0,
+        "id": 4717,
+        "country": {
+          "alpha2": "BE",
+          "name": "Belgium"
+        },
+        "subTeams": [],
+        "teamColors": {
+          "primary": "#52b030",
+          "secondary": "#52b030",
+          "text": "#ffffff"
+        }
+      },
+      "awayTeam": {
+        "name": "Italy",
+        "slug": "italy",
+        "shortName": "Italy",
+        "sport": {
+          "name": "Football",
+          "slug": "football",
+          "id": 1
+        },
+        "userCount": 0,
+        "nameCode": "ITA",
+        "disabled": false,
+        "national": true,
+        "type": 0,
+        "id": 4707,
+        "country": {
+          "alpha2": "IT",
+          "name": "Italy"
+        },
+        "subTeams": [],
+        "teamColors": {
+          "primary": "#52b030",
+          "secondary": "#52b030",
+          "text": "#ffffff"
+        }
+      },
+      "homeScore": {
+        "current": 0,
+        "display": 0,
+        "normaltime": 0
+      },
+      "awayScore": {
+        "current": 2,
+        "display": 2,
+        "normaltime": 2
+      },
+      "time": {},
+      "changes": {
+        "changeTimestamp": 0
+      },
+      "hasGlobalHighlights": false,
+      "crowdsourcingDataDisplayEnabled": false,
+      "id": 96657,
+      "crowdsourcingEnabled": false,
+      "startTimestamp": 961008300,
+      "slug": "belgium-italy",
+      "finalResultOnly": false,
+      "isEditor": false
+    }
+  ]
+}
