@@ -1,5 +1,8 @@
 import json
 from datetime import datetime, timedelta
+import csv
+
+from sofa_score.sofa_score.spiders import tournaments
 
 
 def generate_dates(start_date=datetime(2009, 1, 1), end_date=datetime.now()):
@@ -30,12 +33,11 @@ def generate_dates(start_date=datetime(2009, 1, 1), end_date=datetime.now()):
     return date_list
 
 
-# read file and get id
-def get_id():
-    ids = []
-    with open('tournaments.json', 'r') as f:
-        data = json.load(f)
-        for i in data:
-            id_ = i['id']
-            ids.append(id_)
-    return ids
+def get_unique_tournaments(source_file):
+    unique_tournaments = set()
+    with open(source_file, 'r') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        for row in csv_reader:
+            if row.get('tournament_has_statistics').lower() == 'true':
+                unique_tournaments.add(row.get('tournament_id'))
+    return unique_tournaments
