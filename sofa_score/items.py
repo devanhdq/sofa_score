@@ -58,7 +58,10 @@ class TournamentItem(scrapy.Item):
     tournament_start_timestamp = scrapy.Field()
     tournament_has_event_player_heat_map = scrapy.Field()
 
-    hasEventPlayerStatistics = scrapy.Field()
+
+class StatisticItem(scrapy.Item):
+    url = scrapy.Field()
+    tournament_id = scrapy.Field()
 
     statistic_period = scrapy.Field()
     statistic_group_name = scrapy.Field()
@@ -67,3 +70,31 @@ class TournamentItem(scrapy.Item):
     statistic_home_value = scrapy.Field()
     statistic_away_value = scrapy.Field()
     statistic_compare_code = scrapy.Field()
+
+
+class LineupItem(scrapy.Item):
+    lineup_confirmed = scrapy.Field()
+
+    home_player_name = scrapy.Field()
+    home_player_id = scrapy.Field()
+    home_player_position = scrapy.Field()
+    home_player_shirt_number = scrapy.Field()
+    home_player_country = scrapy.Field()
+    home_player_substitute = scrapy.Field()
+    home_market_value_currency = scrapy.Field()
+    home_date_of_birth_timestamp = scrapy.Field()
+    home_formation = scrapy.Field()
+    home_player_color = scrapy.Field()
+    home_goal_keeper_color = scrapy.Field()
+
+    away_player_name = scrapy.Field()
+    away_player_id = scrapy.Field()
+    away_player_position = scrapy.Field()
+    away_player_shirt_number = scrapy.Field()
+    away_player_country = scrapy.Field()
+    away_player_substitute = scrapy.Field()
+    away_market_value_currency = scrapy.Field()
+    away_date_of_birth_timestamp = scrapy.Field()
+    away_formation = scrapy.Field()
+    away_player_color = scrapy.Field()
+    away_goal_keeper_color = scrapy.Field()

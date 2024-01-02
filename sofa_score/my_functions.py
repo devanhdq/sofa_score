@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timedelta
+import csv
 
 
 def generate_dates(start_date=datetime(2009, 1, 1), end_date=datetime.now()):
@@ -30,12 +31,11 @@ def generate_dates(start_date=datetime(2009, 1, 1), end_date=datetime.now()):
     return date_list
 
 
-# read file and get id
-def get_id():
-    ids = []
-    with open('tournaments.json', 'r') as f:
-        data = json.load(f)
-        for i in data:
-            id_ = i['id']
-            ids.append(id_)
-    return ids
+def get_tournaments_id(source_file):
+    tournaments_id = []
+    with open(source_file, 'r') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        for row in csv_reader:
+            if row.get('tournament_has_statistics', '').lower() == 'true':
+                tournaments_id.append(row.get('tournament_id'))
+    return tournaments_id

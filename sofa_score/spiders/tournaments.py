@@ -12,7 +12,7 @@ class TournamentsSpider(scrapy.Spider):
     allowed_domains = ["api.sofascore.com"]
     main_url = "https://api.sofascore.com/api/v1/sport/football/scheduled-events/"
 
-    days = generate_dates(start_date=datetime(2023, 12, 31))
+    days = generate_dates(start_date=datetime(1990, 1, 1))
 
     urls = []
 
@@ -32,11 +32,10 @@ class TournamentsSpider(scrapy.Spider):
 
     def parse(self, response):
         json_response = json.loads(response.body)
-        tournament_item = TournamentItem()
-
         events = json_response.get("events", [])
         if len(events) != 0:
             for event in events:
+                tournament_item = TournamentItem()
                 tournament = event.get("tournament", {})
                 tournament_item['tournament_name'] = tournament.get("name", None)
                 tournament_item['tournament_category_name'] = tournament.get("category", {}).get("name", None)
@@ -44,6 +43,7 @@ class TournamentsSpider(scrapy.Spider):
                 tournament_item['tournament_unique_name'] = tournament.get("uniqueTournament", {}).get("name", None)
                 tournament_has_statistics = tournament.get("uniqueTournament", {}).get(
                     "hasEventPlayerStatistics", None)
+
                 tournament_item['tournament_has_statistics'] = tournament_has_statistics
 
                 season = event.get("season", {})
@@ -105,55 +105,5 @@ class TournamentsSpider(scrapy.Spider):
                 tournament_id = event.get("id", None)
                 tournament_item['tournament_id'] = tournament_id
                 tournament_item['tournament_start_timestamp'] = event.get("startTimestamp", None)
-                tournament_item['tournament_has_event_player_heat_map'] = event.get("hasEventPlayerHeatMap", None)
 
-                hasEventPlayerStatistics = event.get('hasEventPlayerStatistics', None)
-                tournament_item['hasEventPlayerStatistics'] = hasEventPlayerStatistics
-
-                if tournament_has_statistics or hasEventPlayerStatistics:
-                    yield scrapy.Request(
-                        url=f"https://api.sofascore.com/api/v1/event/{tournament_id}/statistics",
-                        callback=self.parse_statistics,
-                        meta={
-                            "tournament": tournament_item
-                        }
-                    )
-                else:
-                    tournament_item['statistic_period'] = False
-                    tournament_item['statistic_group_name'] = False
-                    tournament_item['statistic_name'] = False
-                    tournament_item['statistic_type'] = False
-                    tournament_item['statistic_home_value'] = False
-                    tournament_item['statistic_away_value'] = False
-                    tournament_item['statistic_compare_code'] = False
-                    yield tournament_item
-
-    def parse_statistics(self, response):
-        json_response = json.loads(response.body)
-        tournament_item = response.meta["tournament"]
-        statistics = json_response.get("statistics", [])
-        for statistic in statistics:
-            tournament_item['statistic_period'] = statistic.get("name", None)
-            groups = statistic.get("groups", [])
-            for group in groups:
-                tournament_item['statistic_group_name'] = group.get("groupName", None)
-                for statistics_item in group.get("statistics", []):
-                    tournament_item['statistic_name'] = statistics_item.get("name", None)
-                    tournament_item['statistic_type'] = statistics_item.get("statisticsType", None)
-                    tournament_item['statistic_home_value'] = statistics_item.get("homeValue", None)
-                    tournament_item['statistic_away_value'] = statistics_item.get("awayValue", None)
-                    tournament_item['statistic_compare_code'] = statistics_item.get("compareCode", None)
-                    yield tournament_item
-
-# def errback_httpbin_statistics(self, failure):
-#     if failure.check(HttpError):
-#         yield {
-#             "tournament_id": response.meta.get("tournament_item"),
-#             "period": None,
-#             "group_name": None,
-#             "statistic": None,
-#             "statistic_home_value": None,
-#             "statistic_away_value": None,
-#             "statistic_compare_code": None,
-#
-#         }
+                yield tournament_item
