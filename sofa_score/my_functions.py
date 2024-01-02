@@ -2,6 +2,8 @@ import json
 from datetime import datetime, timedelta
 import csv
 
+from sofa_score.sofa_score.spiders import tournaments
+
 
 def generate_dates(start_date=datetime(2009, 1, 1), end_date=datetime.now()):
     # Generate a list of dates in the format 'YYYY-MM-DD' within a specified date range.
@@ -31,11 +33,11 @@ def generate_dates(start_date=datetime(2009, 1, 1), end_date=datetime.now()):
     return date_list
 
 
-def get_tournaments_id(source_file):
-    tournaments_id = []
+def get_unique_tournaments(source_file):
+    unique_tournaments = set()
     with open(source_file, 'r') as csv_file:
         csv_reader = csv.DictReader(csv_file)
         for row in csv_reader:
-            if row.get('tournament_has_statistics', '').lower() == 'true':
-                tournaments_id.append(row.get('tournament_id'))
-    return tournaments_id
+            if row.get('tournament_has_statistics').lower() == 'true':
+                unique_tournaments.add(row.get('tournament_id'))
+    return unique_tournaments

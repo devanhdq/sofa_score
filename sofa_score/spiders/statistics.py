@@ -1,7 +1,7 @@
 import scrapy
 import json
 from ..items import StatisticItem
-from ..my_functions import get_tournaments_id
+from ..my_functions import get_unique_tournaments
 from scrapy.spidermiddlewares.httperror import HttpError
 
 
@@ -9,7 +9,7 @@ class StatisticsSpider(scrapy.Spider):
     name = "statistics"
     allowed_domains = ["api.sofascore.com"]
 
-    tournaments_id = get_tournaments_id("./tournaments.csv")
+    tournaments_id = get_unique_tournaments("./tournaments.csv")
 
     def start_requests(self):
         for tournament_id in self.tournaments_id:
@@ -33,12 +33,12 @@ class StatisticsSpider(scrapy.Spider):
             for group in groups:
                 statistics_item['statistic_group_name'] = group.get("groupName", None)
                 for group_statistics_items in group.get('statisticsItems', []):
+                    statistics_item['tournament_id'] = response.meta.get("tournament_id", None)
                     statistics_item['statistic_name'] = group_statistics_items.get("name", None)
                     statistics_item['statistic_home_value'] = group_statistics_items.get("homeValue", None)
                     statistics_item['statistic_away_value'] = group_statistics_items.get("awayValue", None)
                     statistics_item['statistic_type'] = group_statistics_items.get("statisticsType", None)
                     statistics_item['statistic_compare_code'] = group_statistics_items.get("compareCode", None)
-                    statistics_item['tournament_id'] = response.meta.get("tournament_id", None)
                     statistics_item['url'] = response.url
                     yield statistics_item
 
