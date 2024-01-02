@@ -24,6 +24,15 @@ class StatisticsSpider(scrapy.Spider):
             )
 
     def parse(self, response):
+        """
+                Parses the JSON response and yields statistical data.
+
+                Parameters:
+                - response (scrapy.http.Response): The response object containing JSON data.
+
+                Yields:
+                - StatisticItem: An item containing statistical information for further processing.
+                """
         json_response = json.loads(response.body)
         statistics_item = StatisticItem()
         statistics = json_response.get("statistics", [])

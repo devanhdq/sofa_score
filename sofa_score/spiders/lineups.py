@@ -2,17 +2,19 @@ import json
 
 import scrapy
 from scrapy.spidermiddlewares.httperror import HttpError
-
+from ..my_functions import get_unique_tournaments
 from ..items import LineupItem
 
 
 class LineupsSpider(scrapy.Spider):
     name = "lineups"
     allowed_domains = ["api.sofascore.com"]
-    tournament_id = [11352586]
+    tournaments_id = get_unique_tournaments("./tournaments.csv")
+
+    # tournaments_id = [11352586]
 
     def start_requests(self):
-        for tournament_id in self.tournament_id:
+        for tournament_id in self.tournaments_id:
             yield scrapy.Request(
                 url=f'https://api.sofascore.com/api/v1/event/{tournament_id}/lineups',
                 callback=self.parse,
@@ -60,23 +62,9 @@ class LineupsSpider(scrapy.Spider):
         accurate_long_balls = statistics.get("accurateLongBalls", None)
         aerial_lost = statistics.get("aerialLost", None)
         aerial_won = statistics.get("aerialWon", None)
-        duel_lost = statistics.get("duelLost", None)
-        duel_won = statistics.get("duelWon", None)
-        challenge_lost = statistics.get("challengeLost", None)
-        total_contest = statistics.get("totalContest", None)
-        won_contest = statistics.get("wonContest", None)
         interception_won = statistics.get("interceptionWon", None)
-        was_fouled = statistics.get("wasFouled", None)
-        total_tackle = statistics.get("totalTackle", None)
         fouls = statistics.get("fouls", None)
-        minutes_played = statistics.get("minutesPlayed", None)
-        touches = statistics.get("touches", None)
-        rating = statistics.get("rating", None)
-        possession_lost_ctrl = statistics.get("possessionLostCtrl", None)
-        rating_version = statistics.get("ratingVersions", {}).get("original", None)
         good_high_claim = statistics.get("goodHighClaim", None)
-        saves = statistics.get("saves", None)
-        goals_prevented = statistics.get("goalsPrevented", None)
         total_cross = statistics.get("totalCross", None)
         accurate_cross = statistics.get("accurateCross", None)
 
@@ -120,10 +108,11 @@ class LineupsSpider(scrapy.Spider):
             "accurate_cross": accurate_cross,
             "accurate_keeper_sweeper": accurate_keeper_sweeper,
             "accurate_long_balls": accurate_long_balls,
+            'accurate_pass': accurate_pass,
             "blocked_scoring_attempt": blocked_scoring_attempt,
             "big_chance_missed": big_chance_missed,
             "challenge_lost": challenge_lost,
-            "big_chance_created":big_chance_created,
+            "big_chance_created": big_chance_created,
             "country": country,
             "date_of_birth": date_of_birth,
             "duel_lost": duel_lost,
