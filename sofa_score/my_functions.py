@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import csv
+import json
 
 
 def generate_dates(start_date=datetime(2009, 1, 1), end_date=datetime.now()):
@@ -30,21 +31,63 @@ def generate_dates(start_date=datetime(2009, 1, 1), end_date=datetime.now()):
     return date_list
 
 
-def get_unique_tournaments(source_file):
+def get_unique_ids_has_statistics(source_file, encoding='utf-8'):
     """
-        Extracts unique tournament IDs from a CSV file based on the condition that
-        'tournament_has_statistics' is 'true'.
+       Retrieve unique tournament IDs that have statistics available.
 
-        Parameters:
-        - source_file (str): The path to the CSV file.
+       Parameters:
+       - source_file (str): The path to the JSON file containing tournament data.
+       - encoding (str, optional): The encoding of the JSON file. Defaults to 'utf-8'.
 
-        Returns:
-        - set: A set containing unique tournament IDs.
+       Returns:
+       - set: A set of unique tournament IDs that have associated statistics.
+
     """
     unique_tournaments = set()
-    with open(source_file, 'r') as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        for row in csv_reader:
-            if row.get('has_statistics').lower() == 'true':
-                unique_tournaments.add(row.get('id'))
+    with open(source_file, 'r', encoding=encoding) as json_file:
+        data = json.load(json_file)
+        for entry in data:
+            if entry.get('has_statistics') != -1:
+                unique_tournaments.add(entry.get('id'))
+    return unique_tournaments
+
+
+def get_unique_ids_has_highlight(source_file, encoding='utf-8'):
+    """
+        Retrieve unique tournament IDs that have global highlights.
+
+        Parameters:
+        - source_file (str): The path to the JSON file containing tournament data.
+        - encoding (str, optional): The encoding of the JSON file. Defaults to 'utf-8'.
+
+        Returns:
+        - set: A set of unique tournament IDs that have global highlights.
+
+    """
+    unique_tournaments = set()
+    with open(source_file, 'r', encoding=encoding) as json_file:
+        data = json.load(json_file)
+        for entry in data:
+            if entry.get('has_global_highlights') != -1:
+                unique_tournaments.add(entry.get('id'))
+    return unique_tournaments
+
+
+def get_unique_ids(source_file, encoding='utf-8'):
+    """
+        Retrieve unique tournament IDs from a JSON file.
+
+        Parameters:
+        - source_file (str): The path to the JSON file containing tournament data.
+        - encoding (str, optional): The encoding of the JSON file. Defaults to 'utf-8'.
+
+        Returns:
+        - set: A set of unique tournament IDs.
+
+    """
+    unique_tournaments = set()
+    with open(source_file, 'r', encoding=encoding) as json_file:
+        data = json.load(json_file)
+        for entry in data:
+            unique_tournaments.add(entry.get('id'))
     return unique_tournaments

@@ -1,7 +1,7 @@
 import json
 
 import scrapy
-from ..my_functions import get_unique_tournaments
+from ..my_functions import get_unique_ids
 from ..items import BestPlayerItem
 from scrapy.spidermiddlewares.httperror import HttpError
 
@@ -9,7 +9,7 @@ from scrapy.spidermiddlewares.httperror import HttpError
 class BestPlayersSpider(scrapy.Spider):
     name = "best-players"
     allowed_domains = ["api.sofascore.com"]
-    tournaments_id = get_unique_tournaments("./tournaments2023.csv")
+    tournaments_id = get_unique_ids("./tournaments2023.json")
 
     def start_requests(self):
         for tournament_id in self.tournaments_id:
@@ -35,7 +35,7 @@ class BestPlayersSpider(scrapy.Spider):
         best_player['home_value'] = home.get('value')
         best_player['home_label'] = home.get('label')
         best_player['home_player_name'] = home.get('player', {}).get('name')
-        best_player['home_player_name_slug'] = home.get('player', {}).get('nameSlug')
+        best_player['home_player_name_slug'] = home.get('player', {}).get('slug')
         best_player['home_player_short_name'] = home.get('player', {}).get('shortName')
         best_player['home_player_position'] = home.get('player', {}).get('position')
         best_player['home_player_user_count'] = home.get('player', {}).get('userCount')
@@ -46,7 +46,7 @@ class BestPlayersSpider(scrapy.Spider):
         best_player['away_value'] = away.get('value')
         best_player['away_label'] = away.get('label')
         best_player['away_player_name'] = away.get('player', {}).get('name')
-        best_player['away_player_name_slug'] = away.get('player', {}).get('nameSlug')
+        best_player['away_player_name_slug'] = away.get('player', {}).get('slug')
         best_player['away_player_short_name'] = away.get('player', {}).get('shortName')
         best_player['away_player_position'] = away.get('player', {}).get('position')
         best_player['away_player_user_count'] = away.get('player', {}).get('userCount')

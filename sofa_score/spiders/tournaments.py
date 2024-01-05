@@ -11,7 +11,7 @@ class TournamentsSpider(scrapy.Spider):
     allowed_domains = ["api.sofascore.com"]
     main_url = "https://api.sofascore.com/api/v1/sport/football/scheduled-events/"
 
-    days = generate_dates(start_date=datetime(2022, 8, 1), end_date=datetime(2023, 8, 31))
+    days = generate_dates(start_date=datetime(2022, 8, 1))
 
     urls = []
 
@@ -107,7 +107,6 @@ class TournamentsSpider(scrapy.Spider):
             item['current_period_start_timestamp'] = time.get("currentPeriodStartTimestamp", None)
 
             item['has_global_highlights'] = event.get("hasGlobalHighlights", None)
-
             item['start_timestamp'] = event.get("startTimestamp", None)
             item['url'] = response.url
 

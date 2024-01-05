@@ -4,13 +4,13 @@ import scrapy
 from ..items import IncidentVarItem, IncidentInjuryTimeItem, IncidentGoalItem, \
     IncidentCardItem, IncidentPeriodItem, IncidentSubstitutionItem
 from scrapy.spidermiddlewares.httperror import HttpError
-from ..my_functions import get_unique_tournaments
+from ..my_functions import get_unique_ids
 
 
 class IncidentsSpider(scrapy.Spider):
     name = "incidents"
     allowed_domains = ["www.sofascore.com"]
-    tournaments_id = get_unique_tournaments("./tournaments2023.csv")
+    tournaments_id = get_unique_ids("./tournaments2023.json")
 
     def start_requests(self):
         for tournament_id in self.tournaments_id:
@@ -46,7 +46,7 @@ class IncidentsSpider(scrapy.Spider):
 
     def parse_period(self, incident, url, tournament_id):
         period = IncidentPeriodItem()
-        period['tournament_id'] = tournament_id,
+        period['tournament_id'] = tournament_id
         period['incident_type'] = 'period'
         period['text'] = incident.get('text')
         period['home_score'] = incident.get('homeScore')
@@ -71,9 +71,8 @@ class IncidentsSpider(scrapy.Spider):
         card['is_home'] = incident.get('isHome')
         card['incident_class'] = incident.get('incidentClass')
         card['time'] = incident.get('time')
-        card['added_time'] = incident.get('addedTime')
         card['reversed_period_time'] = incident.get('reversedPeriodTime')
-        card['url']: url
+        card['url'] = url
         return card
 
     def parse_substitution(self, incident, url, tournament_id):
@@ -87,7 +86,7 @@ class IncidentsSpider(scrapy.Spider):
         substitution['player_in'] = player_in.get('name')
         substitution['player_in_id'] = player_in.get('id')
         substitution['player_out'] = player_out.get('name')
-        substitution['player_out_id'] = player_out.get('name')
+        substitution['player_out_id'] = player_out.get('id')
         substitution['is_home'] = incident.get('isHome')
         substitution['incident_class'] = incident.get('incidentClass')
         substitution['time'] = incident.get('time')
@@ -133,14 +132,14 @@ class IncidentsSpider(scrapy.Spider):
         # Extract details for varDecision incidents
         var = IncidentVarItem()
 
-        var['tournament_id'] = tournament_id,
-        var['incident_type'] = 'varDecision',
-        var['decision'] = incident.get('incidentClass'),
-        var['time'] = incident.get('time'),
-        var['player_id'] = incident.get('player', {}).get('id'),
-        var['player_name'] = incident.get('player', {}).get('name'),
-        var['reversed_period_time'] = incident.get('reversedPeriodTime'),
-        var['is_home'] = incident.get('isHome'),
+        var['tournament_id'] = tournament_id
+        var['incident_type'] = 'varDecision'
+        var['decision'] = incident.get('incidentClass')
+        var['time'] = incident.get('time')
+        var['player_id'] = incident.get('player', {}).get('id')
+        var['player_name'] = incident.get('player', {}).get('name')
+        var['reversed_period_time'] = incident.get('reversedPeriodTime')
+        var['is_home'] = incident.get('isHome')
         var['url'] = url
 
         return var

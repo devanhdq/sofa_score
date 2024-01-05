@@ -2,14 +2,14 @@ import json
 
 import scrapy
 from scrapy.spidermiddlewares.httperror import HttpError
-from ..my_functions import get_unique_tournaments
+from ..my_functions import get_unique_ids
 from ..items import LineupItem
 
 
 class LineupsSpider(scrapy.Spider):
     name = "lineups"
     allowed_domains = ["api.sofascore.com"]
-    tournaments_id = get_unique_tournaments("./tournaments2023.csv")
+    tournaments_id = get_unique_ids("./tournaments2023.json")
 
     def start_requests(self):
         for tournament_id in self.tournaments_id:
@@ -79,6 +79,7 @@ class LineupsSpider(scrapy.Spider):
 
         lineup_item['duel_lost'] = statistics.get("duelLost", None)
         lineup_item['duel_won'] = statistics.get("duelWon", None)
+        lineup_item['dispossessed'] = statistics.get("dispossessed", None)
         lineup_item['challenge_lost'] = statistics.get("challengeLost", None)
 
         lineup_item['total_contest'] = statistics.get("totalContest", None)

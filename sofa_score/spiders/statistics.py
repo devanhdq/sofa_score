@@ -1,7 +1,7 @@
 import scrapy
 import json
 from ..items import StatisticItem
-from ..my_functions import get_unique_tournaments
+from ..my_functions import get_unique_ids_has_statistics
 from scrapy.spidermiddlewares.httperror import HttpError
 
 
@@ -9,7 +9,7 @@ class StatisticsSpider(scrapy.Spider):
     name = "statistics"
     allowed_domains = ["api.sofascore.com"]
 
-    tournaments_id = get_unique_tournaments("./tournaments2023.csv")
+    tournaments_id = get_unique_ids_has_statistics("./tournaments2023.json")
 
     def start_requests(self):
         for tournament_id in self.tournaments_id:
@@ -25,14 +25,14 @@ class StatisticsSpider(scrapy.Spider):
 
     def parse(self, response):
         """
-                Parses the JSON response and yields statistical data.
+            Parses the JSON response and yields statistical data.
 
-                Parameters:
-                - response (scrapy.http.Response): The response object containing JSON data.
+            Parameters:
+            - response (scrapy.http.Response): The response object containing JSON data.
 
-                Yields:
-                - StatisticItem: An item containing statistical information for further processing.
-                """
+            Yields:
+            - StatisticItem: An item containing statistical information for further processing.
+        """
         json_response = json.loads(response.body)
         statistics_item = StatisticItem()
         statistics = json_response.get("statistics", [])
